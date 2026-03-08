@@ -1,6 +1,5 @@
 import NextAuth, { NextAuthConfig } from 'next-auth'
 import authConfig from './auth.config'
-import axios from 'axios'
 import { Roles } from './types/GlobalType'
 import { NextResponse } from 'next/server'
 
@@ -22,11 +21,21 @@ const config: NextAuthConfig = {
         if (auth) {
           // Token verification
           if (auth.accessToken) {
-            const res = await axios.post(
+            const response = await fetch(
               `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/auth/verify-token`,
-              { token: auth.accessToken }
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  token: auth.accessToken,
+                }),
+              }
             )
-            if (!res.data) return false
+            if (!response.ok) return false
+            const data = await response.json().catch(() => null)
+            if (!data) return false
           }
 
           // Redirect away from sign-in page
