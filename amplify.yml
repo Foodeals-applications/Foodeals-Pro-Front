@@ -1,0 +1,20 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - 'printf "" > .env.production'
+        - env | grep -E '^(NEXT_PUBLIC_BASE_URL|NEXT_PUBLIC_APP_URL|NEXTAUTH_URL|INTERNAL_API_URL|NEXTAUTH_SECRET|AUTH_SECRET|PAYZONE_API_BASE_URL|PAYZONE_BASE_URL|PAYZONE_PAYWALL_URL|PAYZONE_MERCHANT_ID|PAYZONE_API_KEY|PAYZONE_SECRET_KEY|PAYZONE_LANGUAGE|PAYZONE_NOTIFICATION_KEY|PAYZONE_MERCHANT_ACCOUNT)=' >> .env.production
+        - echo "PAYZONE_NOTIFICATION_KEY=your_notification_key_here" >> .env.production
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - node_modules/**/*
+      - .next/cache/**/*
